@@ -1,7 +1,8 @@
+
 {
   "expo": {
-    "name": "Magick Connect",
-    "slug": "Magick Connect",
+    "name": "Magick",
+    "slug": "magick-app",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/natively-dark.png",
@@ -41,9 +42,8 @@
       "typedRoutes": true
     },
     "extra": {
-      "router": {},
-      "backendUrl": "https://utt3w9mxeutueybftvymbcetbxwsh822.app.specular.dev"
+      "router": {}
     }
   },
-  "scheme": "Magick Connect"
+  "scheme": "magick"
 }
