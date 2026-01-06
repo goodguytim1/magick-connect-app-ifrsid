@@ -112,7 +112,7 @@ const styles = StyleSheet.create({
 export default function HomeScreen() {
   const router = useRouter();
   const { selectDeck, selectedDeck } = useDeck();
-  const { theme, colors } = useThemeContext();
+  const { theme, currentColors } = useThemeContext();
 
   const handleDeckSelect = (deck: typeof decks[0]) => {
     selectDeck(deck.id);
@@ -134,7 +134,7 @@ export default function HomeScreen() {
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
+    <View style={[styles.container, { backgroundColor: currentColors.background }]}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.header}>
           <Image
@@ -142,41 +142,51 @@ export default function HomeScreen() {
             style={styles.logo}
             resizeMode="contain"
           />
-          <Text style={[styles.title, { color: colors.text }]}>
+          <Text style={[styles.title, { color: currentColors.text }]}>
             Where conversations become Magick
           </Text>
-          <Text style={[styles.subtitle, { color: colors.text }]}>
+          <Text style={[styles.subtitle, { color: currentColors.text }]}>
             Connect with people through cards
           </Text>
-          <Text style={[styles.subtitle, { color: colors.text }]}>
+          <Text style={[styles.subtitle, { color: currentColors.text }]}>
             Choose your deck
           </Text>
         </View>
 
         <View style={styles.quickActions}>
           <TouchableOpacity
-            style={[styles.actionButton, { backgroundColor: colors.primary }]}
+            style={[styles.actionButton, { backgroundColor: currentColors.primary }]}
             onPress={handleDailyCard}
           >
-            <IconSymbol name="calendar" size={20} color="#fff" />
+            <IconSymbol
+              ios_icon_name="calendar"
+              android_material_icon_name="calendar-today"
+              size={20}
+              color="#fff"
+            />
             <Text style={[styles.actionButtonText, { color: '#fff' }]}>
               Daily Card
             </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={[styles.actionButton, { backgroundColor: colors.card }]}
+            style={[styles.actionButton, { backgroundColor: currentColors.card }]}
             onPress={handleFavorites}
           >
-            <IconSymbol name="heart.fill" size={20} color={colors.primary} />
-            <Text style={[styles.actionButtonText, { color: colors.text }]}>
+            <IconSymbol
+              ios_icon_name="heart.fill"
+              android_material_icon_name="favorite"
+              size={20}
+              color={currentColors.primary}
+            />
+            <Text style={[styles.actionButtonText, { color: currentColors.text }]}>
               Favorites
             </Text>
           </TouchableOpacity>
         </View>
 
         <View style={styles.deckSection}>
-          <Text style={[styles.sectionTitle, { color: colors.text }]}>
+          <Text style={[styles.sectionTitle, { color: currentColors.text }]}>
             All Decks
           </Text>
           <View style={styles.deckGrid}>
@@ -186,25 +196,25 @@ export default function HomeScreen() {
                 style={[
                   styles.deckCard,
                   {
-                    backgroundColor: colors.card,
+                    backgroundColor: currentColors.card,
                     borderWidth: selectedDeck === deck.id ? 2 : 0,
-                    borderColor: colors.primary,
+                    borderColor: currentColors.primary,
                   },
                 ]}
                 onPress={() => handleDeckSelect(deck)}
               >
                 <View style={styles.deckHeader}>
                   <Text style={styles.deckIcon}>{deck.icon}</Text>
-                  <Text style={[styles.deckName, { color: colors.text }]}>
+                  <Text style={[styles.deckName, { color: currentColors.text }]}>
                     {deck.displayName}
                   </Text>
                 </View>
                 <Text
-                  style={[styles.deckDescription, { color: colors.text }]}
+                  style={[styles.deckDescription, { color: currentColors.text }]}
                 >
                   {deck.description}
                 </Text>
-                <Text style={[styles.deckCardCount, { color: colors.text }]}>
+                <Text style={[styles.deckCardCount, { color: currentColors.text }]}>
                   {deck.cardCount} cards
                 </Text>
               </TouchableOpacity>
