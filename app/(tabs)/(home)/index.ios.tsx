@@ -1,144 +1,132 @@
 
-import { decks } from '@/data/decks';
-import { useRouter } from 'expo-router';
+import React from 'react';
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Image,
   Platform,
 } from 'react-native';
-import { useDeck } from '@/contexts/DeckContext';
-import { IconSymbol } from '@/components/IconSymbol';
+import { useRouter } from 'expo-router';
 import { useThemeContext } from '@/contexts/ThemeContext';
-import React from 'react';
+import { useDeck } from '@/contexts/DeckContext';
+import { decks } from '@/data/decks';
+import { IconSymbol } from '@/components/IconSymbol';
 
 export default function HomeScreen() {
-  const { theme } = useThemeContext();
   const router = useRouter();
-  const { selectedDeck, setSelectedDeck, drawCard } = useDeck();
+  const { currentColors } = useThemeContext();
+  const { selectDeck } = useDeck();
 
-  const handleDeckSelect = (deck: typeof decks[0]) => {
-    setSelectedDeck(deck.id);
-  };
+  function handleDeckSelect(deck: typeof decks[0]) {
+    selectDeck(deck);
+    router.push('/(tabs)/draw');
+  }
 
-  const handleDailyCard = () => {
+  function handleDailyCard() {
     router.push('/(tabs)/daily');
-  };
+  }
 
-  const handleShuffle = () => {
-    if (selectedDeck) {
-      drawCard();
-      router.push('/(tabs)/draw');
-    }
-  };
+  function handleShuffle() {
+    router.push('/(tabs)/draw');
+  }
 
-  const handleFavorites = () => {
+  function handleFavorites() {
     router.push('/(tabs)/favorites');
-  };
-
-  const isDark = theme === 'dark';
+  }
 
   return (
-    <View style={[styles.container, { backgroundColor: isDark ? '#000' : '#fff' }]}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* Logo */}
-        <View style={styles.logoContainer}>
-          <Image
-            source={require('@/assets/images/f03d2cac-84d0-4003-9c9c-5f6ecb15467d.png')}
-            style={styles.logo}
-            resizeMode="contain"
-          />
+    <View style={[styles.container, { backgroundColor: currentColors.background }]}>
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Header with Logo */}
+        <View style={styles.header}>
+          <View style={styles.logoContainer}>
+            <Text style={[styles.logoEmoji, { color: currentColors.primary }]}>🔮</Text>
+          </View>
+          <Text style={[styles.title, { color: currentColors.text }]}>Magick!</Text>
+          <Text style={[styles.subtitle, { color: currentColors.accent }]}>
+            ICEBREAKER QUESTIONS & MISSIONS
+          </Text>
         </View>
-
-        {/* Tagline */}
-        <Text style={[styles.tagline, { color: isDark ? '#fff' : '#000' }]}>
-          Where conversations become Magick
-        </Text>
 
         {/* Quick Actions */}
         <View style={styles.quickActions}>
           <TouchableOpacity
-            style={[styles.actionButton, { backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5' }]}
+            style={[styles.quickActionButton, { backgroundColor: currentColors.primary }]}
+            onPress={handleShuffle}
+          >
+            <IconSymbol
+              ios_icon_name="shuffle"
+              android_material_icon_name="shuffle"
+              size={20}
+              color="#FFFFFF"
+            />
+            <Text style={styles.quickActionText}>Shuffle</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.quickActionButton, { backgroundColor: currentColors.secondary }]}
             onPress={handleDailyCard}
           >
-            <IconSymbol name="calendar" size={24} color={isDark ? '#fff' : '#000'} />
-            <Text style={[styles.actionText, { color: isDark ? '#fff' : '#000' }]}>
-              Daily Card
-            </Text>
+            <IconSymbol
+              ios_icon_name="calendar"
+              android_material_icon_name="calendar-today"
+              size={20}
+              color="#FFFFFF"
+            />
+            <Text style={styles.quickActionText}>Daily</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={[styles.actionButton, { backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5' }]}
+            style={[styles.quickActionButton, { backgroundColor: currentColors.highlight }]}
             onPress={handleFavorites}
           >
-            <IconSymbol name="heart.fill" size={24} color={isDark ? '#fff' : '#000'} />
-            <Text style={[styles.actionText, { color: isDark ? '#fff' : '#000' }]}>
-              Favorites
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.actionButton, { backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5' }]}
-            onPress={handleShuffle}
-            disabled={!selectedDeck}
-          >
-            <IconSymbol name="shuffle" size={24} color={selectedDeck ? (isDark ? '#fff' : '#000') : '#999'} />
-            <Text style={[styles.actionText, { color: selectedDeck ? (isDark ? '#fff' : '#000') : '#999' }]}>
-              Shuffle
-            </Text>
+            <IconSymbol
+              ios_icon_name="heart.fill"
+              android_material_icon_name="favorite"
+              size={20}
+              color="#FFFFFF"
+            />
+            <Text style={styles.quickActionText}>Favorites</Text>
           </TouchableOpacity>
         </View>
 
-        {/* Subtitle above deck selector */}
-        <Text style={[styles.subtitle, { color: isDark ? '#aaa' : '#666' }]}>
-          Connect with people through cards
-        </Text>
-
-        {/* Deck Selector */}
-        <Text style={[styles.sectionTitle, { color: isDark ? '#fff' : '#000' }]}>
-          Choose your deck
-        </Text>
-
-        <View style={styles.deckGrid}>
-          {decks.map((deck) => (
-            <TouchableOpacity
-              key={deck.id}
-              style={[
-                styles.deckCard,
-                {
-                  backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5',
-                  borderColor: selectedDeck === deck.id ? deck.color : 'transparent',
-                  borderWidth: selectedDeck === deck.id ? 2 : 0,
-                },
-              ]}
-              onPress={() => handleDeckSelect(deck)}
-            >
-              <Text style={styles.deckIcon}>{deck.icon}</Text>
-              <Text style={[styles.deckName, { color: isDark ? '#fff' : '#000' }]}>
-                {deck.displayName}
-              </Text>
-              <Text style={[styles.deckDescription, { color: isDark ? '#aaa' : '#666' }]}>
-                {deck.description}
-              </Text>
-              <Text style={[styles.cardCount, { color: isDark ? '#888' : '#999' }]}>
-                {deck.cardCount} cards
-              </Text>
-            </TouchableOpacity>
-          ))}
+        {/* Deck Grid */}
+        <View style={styles.deckSection}>
+          <Text style={[styles.sectionTitle, { color: currentColors.text }]}>
+            Choose Your Deck
+          </Text>
+          <View style={styles.deckGrid}>
+            {decks.map((deck) => (
+              <TouchableOpacity
+                key={deck.id}
+                style={[
+                  styles.deckCard,
+                  { backgroundColor: currentColors.card },
+                ]}
+                onPress={() => handleDeckSelect(deck)}
+              >
+                <Text style={styles.deckEmoji}>{deck.icon}</Text>
+                <Text style={[styles.deckName, { color: currentColors.text }]}>
+                  {deck.displayName}
+                </Text>
+                <Text style={[styles.deckDescription, { color: currentColors.textSecondary }]}>
+                  {deck.description}
+                </Text>
+                <Text style={[styles.deckCardCount, { color: currentColors.accent }]}>
+                  {deck.cardCount} cards
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
         </View>
 
-        {/* Draw Card Button */}
-        {selectedDeck && (
-          <TouchableOpacity
-            style={[styles.drawButton, { backgroundColor: decks.find(d => d.id === selectedDeck)?.color || '#8B5CF6' }]}
-            onPress={handleShuffle}
-          >
-            <Text style={styles.drawButtonText}>Draw Card</Text>
-          </TouchableOpacity>
-        )}
+        {/* Bottom Padding */}
+        <View style={{ height: 120 }} />
       </ScrollView>
     </View>
   );
@@ -149,84 +137,85 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    padding: 20,
-    paddingBottom: 100,
+    paddingTop: 60,
+    paddingHorizontal: 20,
+  },
+  header: {
+    alignItems: 'center',
+    marginBottom: 32,
   },
   logoContainer: {
-    alignItems: 'center',
-    marginTop: 20,
-    marginBottom: 16,
+    marginBottom: 12,
   },
-  logo: {
-    width: 120,
-    height: 120,
+  logoEmoji: {
+    fontSize: 64,
   },
-  tagline: {
-    fontSize: 18,
-    fontWeight: '600',
-    textAlign: 'center',
-    marginBottom: 24,
+  title: {
+    fontSize: 48,
+    fontWeight: '800',
+    marginBottom: 8,
+  },
+  subtitle: {
+    fontSize: 14,
+    fontWeight: '700',
+    letterSpacing: 1.5,
   },
   quickActions: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 24,
+    marginBottom: 32,
     gap: 12,
   },
-  actionButton: {
+  quickActionButton: {
     flex: 1,
-    padding: 16,
-    borderRadius: 12,
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 14,
+    borderRadius: 12,
     gap: 8,
   },
-  actionText: {
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  subtitle: {
+  quickActionText: {
+    color: '#FFFFFF',
     fontSize: 14,
-    textAlign: 'center',
-    marginBottom: 8,
+    fontWeight: '700',
+  },
+  deckSection: {
+    marginBottom: 24,
   },
   sectionTitle: {
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: '700',
     marginBottom: 16,
   },
   deckGrid: {
-    gap: 12,
+    gap: 16,
   },
   deckCard: {
-    padding: 16,
-    borderRadius: 12,
+    borderRadius: 20,
+    padding: 20,
+    shadowColor: '#9D4EDD',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 12,
+    elevation: 4,
+  },
+  deckEmoji: {
+    fontSize: 40,
     marginBottom: 12,
   },
-  deckIcon: {
-    fontSize: 32,
-    marginBottom: 8,
-  },
   deckName: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: '700',
-    marginBottom: 4,
+    marginBottom: 8,
   },
   deckDescription: {
     fontSize: 14,
+    lineHeight: 20,
     marginBottom: 8,
   },
-  cardCount: {
+  deckCardCount: {
     fontSize: 12,
-  },
-  drawButton: {
-    padding: 18,
-    borderRadius: 12,
-    alignItems: 'center',
-    marginTop: 24,
-  },
-  drawButtonText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: '700',
+    fontWeight: '600',
   },
 });
