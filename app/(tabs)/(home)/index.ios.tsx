@@ -1,4 +1,3 @@
-
 import React from 'react';
 import {
   View,
@@ -7,6 +6,7 @@ import {
   ScrollView,
   TouchableOpacity,
   Platform,
+  Image,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useThemeContext } from '@/contexts/ThemeContext';
@@ -45,7 +45,11 @@ export default function HomeScreen() {
         {/* Header with Logo */}
         <View style={styles.header}>
           <View style={styles.logoContainer}>
-            <Text style={[styles.logoEmoji, { color: currentColors.primary }]}>🔮</Text>
+            <Image
+              source={require('../../../assets/images/645fca33-eb54-4257-af72-dbabda055c6d.png')}
+              style={styles.logoImage}
+              resizeMode="contain"
+            />
           </View>
           <Text style={[styles.title, { color: currentColors.text }]}>Magick!</Text>
           <Text style={[styles.subtitle, { color: currentColors.accent }]}>
@@ -147,8 +151,9 @@ const styles = StyleSheet.create({
   logoContainer: {
     marginBottom: 12,
   },
-  logoEmoji: {
-    fontSize: 64,
+  logoImage: {
+    width: 120,
+    height: 120,
   },
   title: {
     fontSize: 48,
