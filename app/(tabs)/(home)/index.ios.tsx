@@ -5,8 +5,8 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Platform,
   Image,
+  Platform,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useThemeContext } from '@/contexts/ThemeContext';
@@ -16,11 +16,29 @@ import { IconSymbol } from '@/components/IconSymbol';
 
 export default function HomeScreen() {
   const router = useRouter();
-  const { currentColors } = useThemeContext();
-  const { selectDeck } = useDeck();
+  const { currentColors, theme } = useThemeContext();
+  const { selectDeck, selectedDeck, drawCard } = useDeck();
+
+  const palette = {
+    background: currentColors.background,
+    surface: currentColors.card,
+    text: currentColors.text,
+    textSecondary: currentColors.textSecondary,
+    textMuted: currentColors.textSecondary,
+    border: theme === 'dark' ? 'rgba(255, 255, 255, 0.08)' : '#E6E2F0',
+    primary: currentColors.primary,
+  };
 
   function handleDeckSelect(deck: typeof decks[0]) {
     selectDeck(deck);
+  }
+
+  function handleDrawCard() {
+    if (!selectedDeck) {
+      selectDeck(decks[0]);
+    } else {
+      drawCard();
+    }
     router.push('/(tabs)/draw');
   }
 
@@ -29,6 +47,9 @@ export default function HomeScreen() {
   }
 
   function handleShuffle() {
+    if (selectedDeck) {
+      drawCard();
+    }
     router.push('/(tabs)/draw');
   }
 
@@ -37,100 +58,135 @@ export default function HomeScreen() {
   }
 
   return (
-    <View style={[styles.container, { backgroundColor: currentColors.background }]}>
+    <View style={[styles.container, { backgroundColor: palette.background }]}>
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Header with Logo */}
         <View style={styles.header}>
-          <View style={styles.logoContainer}>
+          <View style={styles.brandRow}>
             <Image
               source={require('../../../assets/images/645fca33-eb54-4257-af72-dbabda055c6d.png')}
-              style={styles.logoImage}
+              style={styles.brandLogo}
               resizeMode="contain"
             />
+            <Text style={[styles.brandTitle, { color: palette.text }]}>Magick</Text>
           </View>
-          <Text style={[styles.title, { color: currentColors.text }]}>Magick!</Text>
-          <Text style={[styles.subtitle, { color: currentColors.accent }]}>
-            ICEBREAKER QUESTIONS & MISSIONS
+          <Text style={[styles.tagline, { color: palette.textSecondary }]}>
+            Where conversations become Magick
           </Text>
         </View>
 
-        {/* Quick Actions */}
+        <Text style={[styles.sectionTitle, { color: palette.text }]}>Choose Your Deck</Text>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.deckScrollContent}
+        >
+          {decks.map((deck) => {
+            const isSelected = selectedDeck?.id === deck.id;
+            return (
+              <TouchableOpacity
+                key={deck.id}
+                style={[
+                  styles.deckCard,
+                  {
+                    backgroundColor: palette.surface,
+                    borderColor: isSelected ? palette.primary : palette.border,
+                  },
+                ]}
+                onPress={() => handleDeckSelect(deck)}
+              >
+                <View
+                  style={[
+                    styles.deckIconWrap,
+                    { backgroundColor: `${deck.color}1A` },
+                  ]}
+                >
+                  <Text style={[styles.deckIconText, { color: deck.color }]}>
+                    {deck.icon}
+                  </Text>
+                </View>
+                <Text style={[styles.deckName, { color: palette.text }]}>
+                  {deck.displayName}
+                </Text>
+                <Text style={[styles.deckDescription, { color: palette.textSecondary }]}>
+                  {deck.description}
+                </Text>
+                <Text style={[styles.deckCardCount, { color: deck.color }]}>
+                  {deck.cardCount} cards
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+        </ScrollView>
+
+        <Text style={[styles.helperText, { color: palette.textMuted }]}>
+          Connect with people through cards
+        </Text>
+
+        <TouchableOpacity
+          style={[styles.primaryButton, { backgroundColor: palette.primary }]}
+          onPress={handleDrawCard}
+        >
+          <IconSymbol
+            ios_icon_name="sparkles"
+            android_material_icon_name="auto-awesome"
+            size={18}
+            color="#FFFFFF"
+          />
+          <Text style={styles.primaryButtonText}>Draw Card</Text>
+        </TouchableOpacity>
+
         <View style={styles.quickActions}>
           <TouchableOpacity
-            style={[styles.quickActionButton, { backgroundColor: currentColors.primary }]}
+            style={[
+              styles.quickActionButton,
+              { backgroundColor: palette.surface, borderColor: palette.border },
+            ]}
             onPress={handleShuffle}
           >
             <IconSymbol
               ios_icon_name="shuffle"
               android_material_icon_name="shuffle"
-              size={20}
-              color="#FFFFFF"
+              size={16}
+              color={palette.primary}
             />
-            <Text style={styles.quickActionText}>Shuffle</Text>
+            <Text style={[styles.quickActionText, { color: palette.text }]}>Shuffle</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={[styles.quickActionButton, { backgroundColor: currentColors.secondary }]}
+            style={[
+              styles.quickActionButton,
+              { backgroundColor: palette.surface, borderColor: palette.border },
+            ]}
             onPress={handleDailyCard}
           >
             <IconSymbol
               ios_icon_name="calendar"
               android_material_icon_name="calendar-today"
-              size={20}
-              color="#FFFFFF"
+              size={16}
+              color={currentColors.secondary}
             />
-            <Text style={styles.quickActionText}>Daily</Text>
+            <Text style={[styles.quickActionText, { color: palette.text }]}>Daily</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={[styles.quickActionButton, { backgroundColor: currentColors.highlight }]}
+            style={[
+              styles.quickActionButton,
+              { backgroundColor: palette.surface, borderColor: palette.border },
+            ]}
             onPress={handleFavorites}
           >
             <IconSymbol
               ios_icon_name="heart.fill"
               android_material_icon_name="favorite"
-              size={20}
-              color="#FFFFFF"
+              size={16}
+              color={currentColors.highlight}
             />
-            <Text style={styles.quickActionText}>Favorites</Text>
+            <Text style={[styles.quickActionText, { color: palette.text }]}>Favorites</Text>
           </TouchableOpacity>
         </View>
-
-        {/* Deck Grid */}
-        <View style={styles.deckSection}>
-          <Text style={[styles.sectionTitle, { color: currentColors.text }]}>
-            Choose Your Deck
-          </Text>
-          <View style={styles.deckGrid}>
-            {decks.map((deck) => (
-              <TouchableOpacity
-                key={deck.id}
-                style={[
-                  styles.deckCard,
-                  { backgroundColor: currentColors.card },
-                ]}
-                onPress={() => handleDeckSelect(deck)}
-              >
-                <Text style={styles.deckEmoji}>{deck.icon}</Text>
-                <Text style={[styles.deckName, { color: currentColors.text }]}>
-                  {deck.displayName}
-                </Text>
-                <Text style={[styles.deckDescription, { color: currentColors.textSecondary }]}>
-                  {deck.description}
-                </Text>
-                <Text style={[styles.deckCardCount, { color: currentColors.accent }]}>
-                  {deck.cardCount} cards
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        </View>
-
-        {/* Bottom Padding */}
-        <View style={{ height: 120 }} />
       </ScrollView>
     </View>
   );
@@ -141,85 +197,124 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    paddingTop: 60,
+    paddingTop: Platform.OS === 'android' ? 44 : 60,
     paddingHorizontal: 20,
+    paddingBottom: 120,
   },
   header: {
-    alignItems: 'center',
-    marginBottom: 32,
+    marginBottom: 20,
   },
-  logoContainer: {
+  brandRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  brandLogo: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+  },
+  brandTitle: {
+    fontSize: 28,
+    fontWeight: '700',
+  },
+  tagline: {
+    fontSize: 13,
+    marginTop: 6,
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: '700',
     marginBottom: 12,
   },
-  logoImage: {
-    width: 120,
-    height: 120,
+  deckScrollContent: {
+    paddingVertical: 4,
+    paddingRight: 20,
+    gap: 16,
   },
-  title: {
-    fontSize: 48,
-    fontWeight: '800',
-    marginBottom: 8,
+  deckCard: {
+    width: 220,
+    borderRadius: 18,
+    padding: 16,
+    borderWidth: 1,
+    shadowColor: '#1B1339',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.08,
+    shadowRadius: 20,
+    elevation: 3,
   },
-  subtitle: {
-    fontSize: 14,
+  deckIconWrap: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 12,
+  },
+  deckIconText: {
+    fontSize: 18,
     fontWeight: '700',
-    letterSpacing: 1.5,
+  },
+  deckName: {
+    fontSize: 16,
+    fontWeight: '700',
+    marginBottom: 6,
+  },
+  deckDescription: {
+    fontSize: 12,
+    lineHeight: 16,
+    marginBottom: 12,
+  },
+  deckCardCount: {
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  helperText: {
+    fontSize: 12,
+    textAlign: 'center',
+    marginTop: 16,
+    marginBottom: 12,
+  },
+  primaryButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 14,
+    borderRadius: 14,
+    gap: 8,
+    shadowColor: '#5D28D8',
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.25,
+    shadowRadius: 20,
+    elevation: 4,
+  },
+  primaryButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '700',
   },
   quickActions: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 32,
-    gap: 12,
+    marginTop: 14,
+    gap: 10,
   },
   quickActionButton: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 14,
+    paddingVertical: 10,
     borderRadius: 12,
-    gap: 8,
+    borderWidth: 1,
+    gap: 6,
+    shadowColor: '#1B1339',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.08,
+    shadowRadius: 16,
+    elevation: 2,
   },
   quickActionText: {
-    color: '#FFFFFF',
-    fontSize: 14,
-    fontWeight: '700',
-  },
-  deckSection: {
-    marginBottom: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '700',
-    marginBottom: 16,
-  },
-  deckGrid: {
-    gap: 16,
-  },
-  deckCard: {
-    borderRadius: 20,
-    padding: 20,
-    shadowColor: '#9D4EDD',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 12,
-    elevation: 4,
-  },
-  deckEmoji: {
-    fontSize: 40,
-    marginBottom: 12,
-  },
-  deckName: {
-    fontSize: 20,
-    fontWeight: '700',
-    marginBottom: 8,
-  },
-  deckDescription: {
-    fontSize: 14,
-    lineHeight: 20,
-    marginBottom: 8,
-  },
-  deckCardCount: {
     fontSize: 12,
     fontWeight: '600',
   },
