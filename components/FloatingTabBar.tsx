@@ -25,7 +25,7 @@ import { useThemeContext } from '@/contexts/ThemeContext';
 export interface TabBarItem {
   name: string;
   route: Href;
-  icon: string;
+  icon: keyof typeof MaterialIcons.glyphMap;
   label: string;
 }
 
@@ -54,19 +54,21 @@ export default function FloatingTabBar({
   });
 
   const translateX = useSharedValue(0);
+  const horizontalPadding = 8;
+  const tabWidth = (containerWidth - horizontalPadding * 2) / tabs.length;
 
   React.useEffect(() => {
     if (activeIndex !== -1) {
-      translateX.value = withSpring(activeIndex * (containerWidth / tabs.length), {
+      translateX.value = withSpring(activeIndex * tabWidth, {
         damping: 20,
         stiffness: 90,
       });
     }
-  }, [activeIndex, containerWidth, tabs.length]);
+  }, [activeIndex, tabWidth]);
 
   const indicatorStyle = useAnimatedStyle(() => ({
     transform: [{ translateX: translateX.value }],
-    width: containerWidth / tabs.length,
+    width: tabWidth,
   }));
 
   function handleTabPress(route: Href) {
@@ -148,7 +150,7 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-around',
+    justifyContent: 'space-between',
     paddingVertical: 12,
     paddingHorizontal: 8,
     boxShadow: '0px 8px 24px rgba(0, 0, 0, 0.3)',

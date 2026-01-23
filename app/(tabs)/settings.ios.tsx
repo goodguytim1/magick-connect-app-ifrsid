@@ -1,11 +1,12 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
+  Image,
   Platform,
   Switch,
   Alert,
@@ -143,7 +144,11 @@ export default function SettingsScreen() {
                 Where conversations become Magick
               </Text>
               <View style={styles.logoContainer}>
-                <Text style={styles.logoEmoji}>🔮</Text>
+                <Image
+                  source={require('../../assets/images/645fca33-eb54-4257-af72-dbabda055c6d.png')}
+                  style={styles.logoImage}
+                  resizeMode="contain"
+                />
               </View>
             </View>
           </View>
@@ -234,7 +239,9 @@ const styles = StyleSheet.create({
   logoContainer: {
     marginTop: 8,
   },
-  logoEmoji: {
-    fontSize: 48,
+  logoImage: {
+    width: 72,
+    height: 72,
+    borderRadius: 36,
   },
 });
