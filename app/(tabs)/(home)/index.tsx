@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Image,
   Platform,
+  Alert,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useThemeContext } from '@/contexts/ThemeContext';
@@ -17,7 +18,7 @@ import { IconSymbol } from '@/components/IconSymbol';
 export default function HomeScreen() {
   const router = useRouter();
   const { currentColors, theme } = useThemeContext();
-  const { selectDeck, selectedDeck, drawCard } = useDeck();
+  const { selectDeck, selectedDeck, drawCard, shuffleDeck } = useDeck();
 
   const palette = {
     background: currentColors.background,
@@ -35,10 +36,11 @@ export default function HomeScreen() {
 
   function handleDrawCard() {
     if (!selectedDeck) {
-      selectDeck(decks[0]);
-    } else {
-      drawCard();
+      Alert.alert('Select a deck', 'Choose a deck first to start drawing cards.');
+      return;
     }
+
+    drawCard();
     router.push('/(tabs)/draw');
   }
 
@@ -47,9 +49,13 @@ export default function HomeScreen() {
   }
 
   function handleShuffle() {
-    if (selectedDeck) {
-      drawCard();
+    if (!selectedDeck) {
+      Alert.alert('Select a deck', 'Choose a deck first to shuffle and draw cards.');
+      return;
     }
+
+    shuffleDeck();
+    drawCard();
     router.push('/(tabs)/draw');
   }
 
@@ -126,7 +132,7 @@ export default function HomeScreen() {
         </Text>
 
         <TouchableOpacity
-          style={[styles.primaryButton, { backgroundColor: palette.primary }]}
+          style={[styles.primaryButton, { backgroundColor: palette.primary, opacity: selectedDeck ? 1 : 0.6 }]}
           onPress={handleDrawCard}
         >
           <IconSymbol
@@ -142,7 +148,7 @@ export default function HomeScreen() {
           <TouchableOpacity
             style={[
               styles.quickActionButton,
-              { backgroundColor: palette.surface, borderColor: palette.border },
+              { backgroundColor: palette.surface, borderColor: palette.border, opacity: selectedDeck ? 1 : 0.6 },
             ]}
             onPress={handleShuffle}
           >

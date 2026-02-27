@@ -16,7 +16,7 @@ import * as Haptics from 'expo-haptics';
 export default function DrawScreen() {
   const router = useRouter();
   const { currentColors, theme } = useThemeContext();
-  const { selectedDeck, currentCard, drawCard, toggleFavorite, isFavorite } = useDeck();
+  const { selectedDeck, currentCard, drawCard, shuffleDeck, remainingCards, totalCards, isDeckExhausted, toggleFavorite, isFavorite } = useDeck();
   const [isCardFavorite, setIsCardFavorite] = useState(false);
 
   const palette = {
@@ -53,6 +53,9 @@ export default function DrawScreen() {
 
   function handleDrawAnother() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    if (isDeckExhausted) {
+      shuffleDeck();
+    }
     drawCard();
   }
 
@@ -90,6 +93,9 @@ export default function DrawScreen() {
           <Text style={[styles.headerTitle, { color: palette.text }]}>Your Card</Text>
           <View style={{ width: 36 }} />
         </View>
+        <Text style={[styles.counterText, { color: palette.text }]}>
+          {totalCards > 0 ? `${remainingCards} / ${totalCards} cards left` : 'No cards in this deck'}
+        </Text>
 
         <View style={styles.cardContainer}>
           <View style={[styles.card, { backgroundColor: palette.surface, borderColor: palette.border }]}>
@@ -145,10 +151,13 @@ export default function DrawScreen() {
 
         <View style={styles.actions}>
           <TouchableOpacity
-            style={[styles.primaryButton, { backgroundColor: palette.primary }]}
+            style={[styles.primaryButton, { backgroundColor: palette.primary, opacity: totalCards === 0 ? 0.6 : 1 }]}
             onPress={handleDrawAnother}
+            disabled={totalCards === 0}
           >
-            <Text style={styles.primaryButtonText}>Draw Another Card</Text>
+            <Text style={styles.primaryButtonText}>
+              {isDeckExhausted ? 'Reshuffle Deck' : 'Draw Another Card'}
+            </Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -170,6 +179,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     marginBottom: 20,
+  },
+  counterText: {
+    fontSize: 13,
+    fontWeight: '600',
+    textAlign: 'center',
+    opacity: 0.75,
+    marginBottom: 14,
   },
   backButton: {
     width: 36,
