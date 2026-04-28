@@ -1,4 +1,4 @@
-{
+﻿{
   "expo": {
     "name": "Magick",
     "slug": "magick-app",
@@ -13,6 +13,7 @@
       "backgroundColor": "#0A0A14"
     },
     "ios": {
+      "icon": "./assets/images/appstore-icon-1024.png",
       "supportsTablet": true,
       "bundleIdentifier": "com.magick.app",
       "infoPlist": {
@@ -47,3 +48,4 @@
   },
   "scheme": "magick"
 }
+
