@@ -57,24 +57,63 @@ magick-connect-app-ifrsid/
 npm install
 ```
 
-**Run in development:**
+**Run in development (use these instead of `npm run ...` — more reliable):**
 ```bash
-npm run dev          # Start with tunnel (for physical device testing)
-npm run android      # Start on Android emulator
-npm run ios          # Start on iOS simulator
-npm run web          # Start in browser
+npx expo start           # Start dev server (scan QR code with Expo Go app)
+npx expo start --tunnel  # Start with tunnel (better for physical devices on different networks)
+npx expo start --web     # Open in browser
+npx expo start --android # Open on Android emulator
+npx expo start --ios     # Open on iOS simulator (Mac only)
 ```
 
 **Build for production:**
 ```bash
-# Web build (creates a dist/ folder)
-npm run build:web
-
-# Android build (generates native Android project in android/ folder)
-npm run build:android
+# Web build — creates a dist/ folder
+npx expo export -p web
 ```
 
-> The web build runs `expo export -p web` then generates a PWA service worker with Workbox. The output lands in a `dist/` folder.
+---
+
+### iOS Build for Apple (App Store)
+
+You **cannot** build an iOS `.ipa` locally on Windows — Apple requires macOS. This project uses **EAS Build**, which compiles the app in Expo's cloud and gives you a file to submit to Apple.
+
+**Step 1 — Log in to Expo:**
+```bash
+npx eas-cli login
+```
+
+**Step 2 — Build the iOS app in the cloud:**
+```bash
+npx eas-cli build --platform ios --profile production
+```
+This uploads your code to Expo's servers, builds it on a Mac in the cloud, and gives you a download link for the `.ipa` file when done. It takes ~10–20 minutes.
+
+**Step 3 — Submit to the App Store:**
+```bash
+npx eas-cli submit --platform ios
+```
+This sends the `.ipa` directly to Apple's App Store Connect. You'll need your Apple Developer account credentials ready.
+
+**Or do both in one command:**
+```bash
+npx eas-cli build --platform ios --profile production --auto-submit
+```
+
+> You need an [Apple Developer account](https://developer.apple.com) ($99/year) and to be logged into EAS (`npx eas-cli login`) before any of this works.
+
+---
+
+### Android Build
+
+```bash
+npx eas-cli build --platform android --profile production
+```
+Outputs an `.aab` file for the Google Play Store, also built in the cloud.
+
+---
+
+> Note: The `npm run dev` / `npm run web` etc. scripts use bash-style env vars (`EXPO_NO_TELEMETRY=1`) that don't work on Windows. Use the `npx expo` / `npx eas-cli` commands above instead.
 
 ---
 
